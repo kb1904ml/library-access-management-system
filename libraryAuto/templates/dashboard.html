@@ -1,0 +1,72 @@
+{% extends 'layout.html' %}
+{% block content %}
+	
+    <h1>Entry/Exit Time Analytics</h1>
+    <canvas id="chart"></canvas>
+    <h2>Summary Statistics</h2>
+    <ul>
+      <li>Total Entries: {{ num_entries }}</li>
+      <li>Total Unique Visitors: {{ num_visitors }}</li>
+      <li>Average Time Spent: {{ avg_time|round(2) }} minutes</li>
+    </ul>
+    <script>
+      var entryTimes = {{ entry_times|tojson }};
+      var exitTimes = {{ exit_times|tojson }};
+      var data = [];
+      for (var i = 0; i < entryTimes.length; i++) {
+        data.push({ x: entryTimes[i], y: 1 });
+      }
+      for (var i = 0; i < exitTimes.length; i++) {
+        data.push({ x: exitTimes[i], y: -1 });
+      }
+      data.sort(function(a, b) { return a.x - b.x; });
+      var chart = new Chart('chart', {
+        type: 'line',
+        data: {
+          datasets: [{
+            data: data,
+            lineTension: 0,
+            borderColor: 'blue',
+            borderWidth: 2,
+            pointRadius: 0,
+            fill: false
+          }]
+        },
+        options: {
+          scales: {
+            xAxes: [{
+              type: 'time',
+              time: {
+                unit: 'minute',
+                displayFormats: {
+                  minute: 'h:mm a'
+                }
+              }
+            }],
+            yAxes: [{
+              ticks: {
+                suggestedMin: 0,
+                suggestedMax: 2,
+                callback: function(value, index, values) {
+                  return value == 1 ? 'In' : 'Out';
+                }
+              }
+            }]
+          },
+          legend: {
+            display: false
+          },
+          tooltips: {
+            callbacks: {
+              label: function(tooltipItem, data) {
+                var label = tooltipItem.xLabel.toLocaleString();
+                label += tooltipItem.yLabel == 1 ? ': Entry' : ': Exit';
+                return label;
+              }
+            }
+          }
+        }
+      });
+    </script>
+
+{% endblock content %}

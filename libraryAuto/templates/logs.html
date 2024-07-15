@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block content %}
+
+    <form method="GET" action="/display_records">
+        <label for="start-time">Start Time:</label>
+        <input type="datetime-local" id="start-time" name="start_time" required>
+      
+        <label for="end-time">End Time:</label>
+        <input type="datetime-local" id="end-time" name="end_time" value="{{ current_time.strftime('%Y-%m-%dT%H:%M:%S') }}" required>
+      
+        <button type="submit">Download</button>
+      </form>
+
+{% endblock content %}
